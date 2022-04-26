@@ -1,0 +1,241 @@
+---
+title: "Asesoría 1"
+output: html_notebook
+---
+
+* Importación de datos
+
+```{r}
+library(foreign)
+
+read.spss("Ejemplo.sav", to.data.frame = TRUE)
+```
+
+```{r}
+modulo1_2020 = read.csv("Enaho01-2020-100.csv")
+```
+
+```{r}
+setwd("C:/Users/soyma/Documents/GitHub/Stats_UPC/ENAHO-737-Modulo01/Bases")
+```
+
+```{r}
+#setwd("~/GitHub/Stats_UPC/ENAHO-737-Modulo01/Bases")
+```
+
+```{r}
+library(haven)
+
+modulo1_2020 = read_stata("enaho01-2020-100.dta")
+```
+
+* Banco de preguntas 
+
+1.	Cargar el archivo Data_Migrantes.xlsx e identificar el tipo de variable de la pregunta Rango de Edad y la cantidad de casos entre 18 a 25 años.
+
+```{r}
+library(readxl) 
+
+migrantes = read_excel("Dataset_Migrantes.xlsx")
+```
+
+```{r}
+head(migrantes)
+```
+
+```{r}
+colnames(migrantes)
+```
+
+```{r}
+dim(migrantes)
+```
+
+```{r}
+str(migrantes)
+```
+
+```{r}
+table(migrantes$`Rango de edad`)
+```
+
+Respuesta: Cualitativa ordinal, 210 casos en el rango de edad de 18 a 25 años.
+
+2.	En la variable “tamaño de grupo de viaje” de la data Data_Migrantes.xlsx, indicar la media de los casos y la cantidad de valores perdidos. Considerar dos decimales sin redondear.
+
+```{r}
+summary(migrantes$`Tamaño de grupo de viaje`)
+```
+
+```{r}
+library(Hmisc)
+
+describe(migrantes$`Tamaño de grupo de viaje`)
+```
+
+Respuesta: 2.3 y 2
+
+3.	En la data Data_Migrantes.xlsx , eliminar los casos del 165 al 170 y del 180 al 190, e indicar la nueva media de la variable edad. 
+
+```{r}
+nueva_base = migrantes[- c(165:170, 180:190), ]
+```
+
+```{r}
+describe(nueva_base$Edad)
+```
+Respuesta: 29.09
+
+4.	Señalar la cantidad de casos válidos y perdidos de la Variable País de destino en el conjunto de datos Data_Migrantes.xlsx
+
+```{r}
+#nrow(migrantes[is.na(migrantes$`País de destino`),])
+```
+
+```{r}
+describe(migrantes$`País de destino`) #frecuencias relativas , hace la división entre casos válidos
+```
+
+```{r}
+prop.table(table(migrantes$`País de destino`)) #frecuencias relativas (sin valores pérdidos) 
+#hace la división entre casos válidos
+```
+
+```{r}
+table(migrantes$`País de destino`)/nrow(migrantes) #con valores perdidos, hace la división entre todos los casos
+```
+
+Respuesta: 487 casos válidos y 13 valores perdidos.
+
+5.	Usa la base de datos “Encuesta.sav” y marca la respuesta correcta.
+
+```{r}
+library(foreign)       
+
+mydata = read.spss("Encuesta.sav", to.data.frame=TRUE)
+```
+
+```{r}
+head(mydata)
+```
+
+
+a)	Hombre (1) es la moda de la variable “sexo” (F)
+
+```{r}
+describe(mydata$sexo)
+```
+
+b)	La variable “edad” tiene información incompleta (F)
+
+```{r}
+describe(mydata$edad)
+```
+
+c)	La mediana de edad es 54 años (F)
+
+d)	La edad más baja es 18 años (v)
+
+1.	Usa la base de datos “Encuesta.sav” y marca la respuesta correcta.
+
+a.	Los ingresos el 2013 tenían por mediana el valor de 2860.744 (F)
+```{r}
+summary(mydata$ing13)
+```
+
+b.	Los ingresos el 2015 tenían por mediana el valor de 3036.878 (F)
+```{r}
+summary(mydata$ing15)
+```
+
+c.	Los ingresos el 2018 tenían por mediana el valor de 3135.921 (V)
+```{r}
+summary(mydata$ing18)
+```
+
+```{r}
+median(mydata$ing18)
+```
+
+d.	Los ingresos el 2016 tenían por media el valor de 357.1 (F)
+```{r}
+mean(mydata$ing16)
+```
+
+1.	Usa la base de datos “Encuesta.sav” y marca la respuesta correcta.
+
+a.	La variable región tiene escala ordinal (F)
+```{r}
+str(mydata)
+```
+
+b.	En la variable región, la moda de la zona oeste (4) es 657
+```{r}
+summary(mydata$reg)
+```
+
+2.	La variable educación tiene 7 valores perdidos (V)
+```{r}
+describe(mydata$educ)
+```
+
+3.	La variable Aprobación de Foncodes – 2018(aproFC2018) tiene 604 valores perdidos (F)
+```{r}
+describe(mydata$aproFC18)
+```
+
+* Creen un data frame de 5 columnas y 7 casos
+```{r}
+nombres = c("Chiara", "John", "Pamela", "Giancarlo","Fabrizio","Rosita", NA)
+edad = c(23, 24, 20, 19, 20, 22, 24)
+educ = c("univ","univ", "secundaria", "secundaria", "secundaria", NA, "univ")
+voto = c("en blanco", "nulo", "KF", "LA", NA, "HDS", "PC")
+estado_civil = c("soltero", "soltero", "casado", "viudo",NA, "divorciado", "soltero")
+```
+
+```{r}
+upc =data.frame(nombres, edad, educ, voto, estado_civil)
+```
+
+```{r}
+upc
+```
+
+```{r}
+ingresos = c(1000, 2000, 500, 300, 350, 1000, 1500)
+```
+
+```{r}
+nuevo_upc = data.frame(upc, ingresos)
+```
+
+```{r}
+nuevo_upc[8,] = c("Fabricio", 20, "secundaria", "KF","soltero", 2000)
+```
+
+```{r}
+str(nuevo_upc)
+```
+
+```{r}
+nuevo_upc$edad = as.numeric(nuevo_upc$edad)
+```
+
+```{r}
+nuevo_upc$ingresos = as.numeric(nuevo_upc$ingresos)
+```
+
+```{r}
+nuevo_upc$division = nuevo_upc$ingresos/nuevo_upc$edad
+```
+
+```{r}
+nuevo_upc
+```
+
+```{r}
+nuevo_upc$adulto = ifelse(nuevo_upc$edad > 20, "adulto", "adolescente") 
+
+describe(nuevo_upc$adulto)
+```
+

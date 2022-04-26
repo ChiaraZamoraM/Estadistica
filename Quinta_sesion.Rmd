@@ -12,7 +12,7 @@ output:
 
 Veremos:
 
-**Análisis exploratorio**
+**Análisis exploratorio y descriptivo**
 
 1. [Importación de datos](### **1. Importación de datos**)
 
@@ -30,9 +30,18 @@ mydata = read.csv("https://github.com/ChiaraZamoraM/Stats_UPC/raw/main/ENAHO-737
 ```
 
 ```{r}
-mydata = ?read.csv("./ENAHO-737-Modulo01/Bases/Enaho01-2020-100.csv") #coma (“,”) como separador
+getwd()
+```
+
+```{r}
+setwd("C:/Users/soyma/Documents/GitHub/Stats_UPC")
+```
+
+```{r}
+mydata = read.csv("./ENAHO-737-Modulo01/Bases/Enaho01-2020-100.csv") #coma (“,”) como separador
 
 #library(readr)
+#read_csv (como como separador)
 #read_csv2(): punto y coma (“;”) como separador
 #read_tsv(): tabulador (“\t”) como separador
 #read_delim(,sep =’|’): otros separadores, p. ej. el símbolo ‘|’
@@ -54,6 +63,10 @@ mydata = read_excel("./Matriz_2020/Matriz_2020.xlsx", sheet = "Regional")
 mydata = read_excel("./Matriz_2020/Matriz_2020.xlsx", sheet = 2, skip = 8)
 ```
 
+```{r}
+colnames(mydata) = mydata[3,]
+```
+
 - SPSS: .sav  
 ```{r}
 library(foreign)       
@@ -72,7 +85,7 @@ mydata = read_stata("https://github.com/ChiaraZamoraM/Stats_UPC/raw/main/ENAHO-7
 ```{r}
 #library(haven)
 
-#mydata = read_sas("data.sas")
+#mydata = read_sas("data.sas") #el nombre del archivo
 ```
 
 - R: .rda
@@ -89,7 +102,7 @@ mydata = read_stata("https://github.com/ChiaraZamoraM/Stats_UPC/raw/main/ENAHO-7
 ```{r}
 library(rio)
 
-#función --> import
+mydata = import("https://github.com/ChiaraZamoraM/Stats_UPC/raw/main/ENAHO-737-Modulo01/Bases/enaho01-2020-100.dta")
 ```
 
 ### **2. Datos cualitativos**
@@ -102,6 +115,10 @@ Usaremos el data frame integrado de R llamado **painters**. Es una recopilación
 library(MASS)
 
 painters
+```
+Para conocer la estructura de una base/una data frame...
+```{r}
+str(painters)
 ```
 
 La última columna School contiene la información de clasificación escolar de los pintores. Los colegios se nombran como A, B, ..., etc, y la variable School es cualitativa.
@@ -116,7 +133,7 @@ La distribución de frecuencia de una variable de datos es un resumen de la apar
 
 - Ejemplo
 
-En el conjunto de datos pintores, la distribución de frecuencias de la variable Escuela es un resumen del número de pintores en cada escuela.
+En el conjunto de datos de pintores, la distribución de frecuencias de la variable School es un resumen del número de pintores en cada escuela.
 
 - Problema
 
@@ -124,11 +141,11 @@ Encuentre la distribución de frecuencias de las escuelas de pintores en el conj
 
 - Solución
 
-Aplicamos la función de tabla para calcular la distribución de frecuencias de la variable School.
+Aplicamos la función de **table** para calcular la distribución de frecuencias de la variable School.
 ```{r}
-school = pintores$School # las escuelas de pintores
+school = painters$School # las escuelas de pintores
 
-school.freq = table(school)
+school.freq = table(painters$School)
 ```
 
 - Respuesta
@@ -156,7 +173,7 @@ Frecuencia Relativa =    Frecuencia/
 
 - Ejemplo
 
-En el conjunto de datos de pintores, la distribución de frecuencia relativa de la variable Escuela es un resumen de la proporción de pintores en cada escuela.
+En el conjunto de datos de pintores, la distribución de frecuencia relativa de la variable School es un resumen de la proporción de pintores en cada escuela.
 
 - Problema
 
@@ -181,6 +198,16 @@ La distribución de frecuencia relativa de las escuelas es:
 school.relfreq
 ```
 
+```{r}
+table(painters$School)
+```
+
+Alternativa 1:
+```{r}
+prop.table(table(painters$School))
+```
+
+
 ### **3. Datos cuantitativos**
 
 #### a. Medidas de tendencia central
@@ -189,33 +216,37 @@ Los datos cuantitativos, también conocidos como datos continuos, consisten en d
 
 Usaremos el data frame **faithful**. Consiste en una colección de observaciones del géiser Old Faithful en el Parque Nacional de Yellowstone en los Estados Unidos. La siguiente es una vista previa a través de la función principal.
 
+```{r}
+View(faithful)
+```
+
 * **Media**
 
 La media de una variable de observación es una medida numérica de la ubicación central de los valores de los datos. Es la suma de sus valores de datos dividida por el conteo de datos.
 
 - Problema
-Encuentre la duración media de la erupción en el conjunto de datos fiel.
+Encuentre la duración media de la erupción en el conjunto de datos **faithful**.
 
 - Solución
-Aplicamos la función media para calcular el valor medio de las erupciones.
+Aplicamos la función mean para calcular el valor medio de las erupciones.
 ```{r}
 duration = faithful$eruptions
 
-mean(duration)      
+mean(faithful$eruptions)      
 ```
 
 - Respuesta
-La duración media de la erupción es de 3,4878 minutos.
+La duración media de la erupción es de 3.4878 minutos.
 
 * **Mediana**
 
 La mediana de una variable de observación es el valor en el medio cuando los datos se ordenan en orden ascendente. Es una medida ordinal de la ubicación central de los valores de los datos.
 
 - Problema
-Encuentre la mediana de la duración de la erupción en el conjunto de datos fieles.
+Encuentre la mediana de la duración de la erupción en el conjunto de datos faithful.
 
 - Solución
-Aplicamos la función mediana para calcular el valor mediano de las erupciones.
+Aplicamos la función median para calcular el valor mediano de las erupciones.
 ```{r}
 median(duration)      
 ```
@@ -229,6 +260,8 @@ La mediana de la duración de la erupción es de 4 minutos.
 mode <- function(x) {
    return(as.numeric(names(which.max(table(x)))))
 }
+
+#as.numeric(names(which.max(table(duration))))
 ```
 
 ```{r}
@@ -243,7 +276,7 @@ Hay varios cuartiles de una variable de observación. El primer cuartil, o cuart
 Encuentre los cuartiles de las duraciones de las erupciones en el conjunto de datos faithful.
 
 - Solución
-Aplicamos la función cuantil para calcular los cuartiles de las erupciones.
+Aplicamos la función quantile para calcular los cuartiles de las erupciones.
 ```{r}
 quantile(duration)  
 ```
@@ -252,13 +285,14 @@ quantile(duration)
 Los cuartiles primero, segundo y tercero de la duración de la erupción son 2.1627, 4.0000 y 4.4543 minutos respectivamente.
 
 * **Percentil**
+
 El percentil n de una variable de observación es el valor que corta el primer n por ciento de los valores de datos cuando se ordena en orden ascendente.
 
 - Problema
-Encuentre los percentiles 32, 57 y 98 de las duraciones de las erupciones en el conjunto de datos fieles.
+Encuentre los percentiles 32, 57 y 98 de las duraciones de las erupciones en el conjunto de datos faithful.
 
 - Solución
-Aplicamos la función cuantil para calcular los percentiles de las erupciones con las proporciones porcentuales deseadas.
+Aplicamos la función quantile para calcular los percentiles de las erupciones con las proporciones porcentuales deseadas.
 ```{r}
 quantile(duration, c(.32, .57, .98))
 ```
@@ -278,7 +312,7 @@ names(estadistica)
 ```
 
 ```{r}
-#names(estadistica) = c("1","2","3","4"...)
+names(estadistica) = c("Marca_temporal","Edad","Region","Interes", "Temas", "Lentes", "A_lentes")
 ```
 
 ```{r}
@@ -294,11 +328,11 @@ dim(estadistica)
 ```
 
 ```{r}
-head(estadistica)
+head(estadistica, 10)
 ```
 
 ```{r}
-tail(estadistica)
+tail(estadistica,10)
 ```
 
 ```{r}
@@ -314,7 +348,7 @@ describe(estadistica)
 ```
 
 ```{r}
-describe(estadistica$edad)
+describe(estadistica$Edad)
 ```
 
 ```{r}
@@ -322,5 +356,5 @@ summary(estadistica)
 ```
 
 ```{r}
-summary(estadistica$edad)
+summary(estadistica$Edad)
 ```
