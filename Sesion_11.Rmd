@@ -206,7 +206,7 @@ La función devuelve:
 * intervalos de confianza del 95%
 * una probabilidad estimada de éxito (la proporción de individuos en contra en los dos grupos)
 
-**Interpretación**: El valor p de la prueba es 2,36310^{-19}, que es menor que el nivel de significancia alfa = 0,05. Podemos concluir que la proporción de fumadores es significativamente diferente en los dos grupos con un valor de p = 2.36310^{-19}.
+**Interpretación**: El valor p de la prueba es 2,36310^{-19}, que es menor que el nivel de significancia alfa = 0,05. Podemos concluir que la proporción de individuos en contra es significativamente diferente en los dos grupos con un valor de p = 2.36310^{-19}.
 
 Tenga en cuenta que:
 
@@ -270,7 +270,7 @@ res
 
 La función devuelve: el valor del estadístico de prueba chi-cuadrado ("X-cuadrado") y un valor p.
 
-**Interpretación**: El valor p de la prueba es 8,80310^{-7}, que es menor que el nivel de significación alfa = 0.05. Podemos concluir que los colores no tienen una distribución común significativa con un valor p = 8.80310^{-7}.
+**Interpretación**: El valor p de la prueba es 8,80310^{-7}, que es menor que el nivel de significación alfa = 0.05. Podemos concluir que las categorías no tienen una distribución común significativa con un valor p = 8.80310^{-7}.
 
 **OJO**: Tenga en cuenta que la prueba de chi-cuadrado debe usarse solo cuando todos los valores esperados calculados son mayores que 5.
 

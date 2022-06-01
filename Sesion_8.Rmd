@@ -4,6 +4,12 @@ output: html_notebook
 ---
 
 
+Trabajaremos con...
+```{r}
+data = read_excel("state_democracy_final.xlsx")
+```
+
+
 ### **3. Datos cuantitativos**
 
 Ahora, veamos algunas medidas de tendencia central, distribución y dispersión para el caso de variables numéricas. Trabajemos con la variable *state legitimacy*, indicador que evalúa la representatividad y apertura del gobierno, y la manera como interactúa con la ciudadanía. Se toman en cuenta los niveles de confianza en las instituciones, demostraciones de desobediencia civil e insurgencias armadas.
