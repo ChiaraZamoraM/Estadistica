@@ -52,7 +52,6 @@ sqrt(b)
 ```
 
 * Buscar ayuda en R
-
 ```{r}
 #?sqrt
 
@@ -62,7 +61,6 @@ sqrt(b)
 ### **2. Directorio de trabajo**
 
 * El comando getwd muestra el directorio de trabajo actual.
-
 ```{r}
 getwd()
 ```
@@ -100,7 +98,6 @@ length(c("aa", "bb", "cc", "dd", "ee"))
 * **Combinando vectores**
 
 Los vectores se pueden combinar a través de la función c. Por ejemplo, los siguientes dos vectores n y s se combinan en un nuevo vector que contiene elementos de ambos vectores.
-
 ```{r}
 n = c(2, 3, 5) 
 s = c("aa", "bb", "cc", "dd", "ee") 

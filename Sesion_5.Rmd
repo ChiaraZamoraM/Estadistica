@@ -43,18 +43,22 @@ mydata = read.csv("./ENAHO-737-Modulo01/Bases/Enaho01-2020-100.csv") #coma (“,
 
 * **Formatos de otros softwares propietario**
 
+```{r}
+#setwd()
+```
+
 - EXCEL: .xls y .xlsx
 ```{r}
 library(readxl) 
 
-mydata = read_excel("./Matriz_2020/Matriz_2020.xlsx") 
+mydata = read_excel("./matriz_2020.xlsx") 
 
-mydata = read_excel("./Matriz_2020/Matriz_2020.xlsx",
+mydata = read_excel("./matriz_2020.xlsx",
                     sheet = 2) 
 
-mydata = read_excel("./Matriz_2020/Matriz_2020.xlsx", sheet = "Regional") 
+mydata = read_excel("./matriz_2020.xlsx", sheet = "Regional") 
 
-mydata = read_excel("./Matriz_2020/Matriz_2020.xlsx", sheet = 2, skip = 8)
+mydata = read_excel("./matriz_2020.xlsx", sheet = 2, skip = 8)
 ```
 
 ```{r}
@@ -65,14 +69,14 @@ colnames(mydata) = mydata[3,]
 ```{r}
 library(foreign)       
 
-mydata = read.spss("https://github.com/ChiaraZamoraM/Stats_UPC/raw/main/ENAHO-737-Modulo01/Bases/Enaho01-2020-100.sav", to.data.frame=TRUE)
+mydata = read.spss("https://github.com/ChiaraZamoraM/Stats_UPC/raw/main/Databases/Enaho01-2020-100.sav", to.data.frame=TRUE)
 ```
 
 - STATA: .dta
 ```{r}
 library(haven)
 
-mydata = read_stata("https://github.com/ChiaraZamoraM/Stats_UPC/raw/main/ENAHO-737-Modulo01/Bases/enaho01-2020-100.dta") 
+mydata = read_stata("https://github.com/ChiaraZamoraM/Stats_UPC/raw/main/Databases/enaho01-2020-100.dta") 
 ```
 
 - SAS: .sas
@@ -108,12 +112,12 @@ Una muestra de datos se denomina cualitativa o categórica, si sus valores perte
 Los ejemplos comunes incluyen la calificación de letras de los estudiantes (A, B, C, D o F), calificación de bonos comerciales (AAA, AAB, ...) y tallas de zapatos de ropa de consumo (0, 2, 4, ...).
 
 Usaremos el data frame integrado de R llamado **painters**. Es una recopilación de información técnica de algunos pintores clásicos del siglo XVIII. El conjunto de datos pertenece al paquete MASS y debe cargarse previamente en el espacio de trabajo de R antes de su uso.
-
 ```{r}
 library(MASS)
 
 painters
 ```
+
 Para conocer la estructura de una base/una data frame...
 ```{r}
 str(painters)
