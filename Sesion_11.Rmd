@@ -28,7 +28,7 @@ La prueba Z de una proporción se utiliza para comparar una proporción observad
 
 Por ejemplo, tenemos una población de individuos que contiene la mitad de hombres y la mitad de mujeres (p = 0.5 => 50%). Algunos de estos individuos (n = 160) están en contra de la incorporación del enfoque de igualdad de género al Currículo Nacional, incluidos 95 hombres y 65 mujeres.
 
-Queremos saber si la negativa es más frecuente en hombres que mujeres.
+Queremos saber si la negativa es más frecuente en hombres que en mujeres.
 
 En esta configuración:
 
@@ -37,6 +37,17 @@ En esta configuración:
 * Proporción observada (q) de mujeres es 1−po
 * Proporción esperada (pe) de hombres es 0.5 (50%)
 * Número de observaciones (n) es 160
+
+Europa se divide en países del este y países del oeste, el 40% son países del este y el 60% son países del oeste. Algunos de estos son países (n=30) son dictaduras, incluidos 20 del este y 10 del oeste. 
+
+**Queremos saber si las dictaduras son más frecuentes en el oeste.**
+
+* Éxito: país del oeste en dictadura
+* Número de éxitos (país del oeste en dictadura) es 10 
+* Proporción observada (po) de países del oeste 10/30 = 0.33
+* Proporción observada de países del este 1-po = 0.67
+* Proporción esperada de países del oeste 0.6 (60%)
+* Numero de observaciones 30. 
 
 ##### **Preguntas típicas de investigación**
 
@@ -54,12 +65,12 @@ Las hipótesis alternativas correspondientes (Ha) son las siguientes:
 
 * Ha:po≠pe (diferente)
 * Ha:po>pe (mayor)
-* Ha:po<pe (menos)
+* Ha:po<pe (menor)
 
 Tenga en cuenta que:
 
-Las hipótesis 1) se denominan pruebas de dos colas
-Las hipótesis 2) y 3) se denominan pruebas de una cola.
+Las hipótesis 1) se denominan pruebas de dos colas --> two-sided, two tails --> "diferente"
+Las hipótesis 2) y 3) se denominan pruebas de una cola --> one-sided, one tail --> "mayor"-->"greater", "menor" --> "less"
 
 #### **¿Cómo interpretar los resultados?**
 
@@ -70,13 +81,13 @@ Las hipótesis 2) y 3) se denominan pruebas de una cola.
 
 Las funciones de R binom.test() y prop.test() se pueden usar para realizar una prueba de una proporción:
 
-* *binom.test()*: calcula la prueba binomial exacta. Recomendado cuando el tamaño de la muestra es pequeño
+* *binom.test()*: calcula la prueba binomial exacta. Recomendado cuando el tamaño de la muestra es pequeño.
 * *prop.test()*: se puede usar cuando el tamaño de la muestra es grande (N > 30). Utiliza una aproximación normal a binomial.
 
 La sintaxis de las dos funciones es exactamente la misma. El formato simplificado es el siguiente:
 
 **binom.test(x, n, p = 0.5, alternative = "two.sided")**
-**prop.test(x, n, p = NULL, alternative = "two.sided",correct = TRUE)**
+**prop.test(x, n, p = NULL, alternative = "two.sided", correct = TRUE)**
 
 * x: el número de éxitos
 
@@ -88,7 +99,7 @@ La sintaxis de las dos funciones es exactamente la misma. El formato simplificad
 
 #### **Procesamiento de datos**
 
-Queremos saber si la negativa es más frecuente en hombres que mujeres.
+Queremos saber si la negativa entre los hombres es mayor en la muestra que la distribución en la población.
 ```{r}
 res <- prop.test(x = 95, n = 160, p = 0.5, 
                  correct = FALSE)
@@ -103,7 +114,7 @@ La función devuelve:
 * intervalos de confianza del 95%
 * una probabilidad estimada de éxito (la proporción de hombres en contra)
 
-**Interpretación**: El valor p de la prueba es 0.01771, que es menor que el nivel de significación alfa = 0,05. Podemos concluir que la proporción de hombres en contra es significativamente diferente de 0,5 con un valor de p = 0.01771.
+**Interpretación**: El valor p de la prueba es 0.01771, que es menor que el nivel de significación alfa = 0.05. Podemos concluir que la proporción de hombres en contra es significativamente diferente de 0.5 con un valor de p = 0.01771.
 
 Tenga en cuenta que:
 
@@ -139,7 +150,7 @@ Grupo B, solo con educación básica completa: n = 500, 400 en contra, pB=400/50
 
 En esta configuración:
 
-* La proporción total de individuos **en contra** es p=frac(490+400)500+500=89
+* La proporción total de individuos **en contra** es p=(490+400)/(500+500)=89
 * La proporción general de individuos **a favor** es q=1−p=11
 
 Queremos saber si las proporciones de individuos en contra son las mismas en los dos grupos de individuos.
@@ -194,7 +205,7 @@ La prueba de probabilidad exacta de Fisher es una excelente técnica no paramét
 
 Queremos saber si las proporciones de individuos en contra son las mismas en los dos grupos de individuos.
 ```{r}
-res <- prop.test(x = c(490, 400), n = c(500, 500))
+res <- prop.test(x = c(490, 400), n = c(500, 500), correct = FALSE)
 
 res 
 ```
@@ -211,6 +222,7 @@ La función devuelve:
 Tenga en cuenta que:
 
 si desea probar si la proporción observada de individuos en contra en el grupo A (pA) es menor que la proporción observada de individuos en contra en el grupo (pB), escriba esto:
+
 ```{r}
 prop.test(x = c(490, 400), n = c(500, 500),
            alternative = "less")
@@ -276,12 +288,19 @@ La función devuelve: el valor del estadístico de prueba chi-cuadrado ("X-cuadr
 
 Respuesta a P2 comparando las proporciones observadas con las esperadas
 ```{r}
+81/158 #--> 1/2 = 0.5
+50/158 #--> 1/3 = 0.33
+27/158 #--> 1/6 = 0.17
+```
+
+
+```{r}
 evaluacion <- c(81, 50, 27)
-res <- evaluacion(tulip, p = c(1/2, 1/3, 1/6))
+res <- chisq.test(evaluacion, p = c(1/2, 1/3, 1/6))
 res
 ```
 
-**Interpretación**: El valor p de la prueba es 0,9037, que es mayor que el nivel de significación alfa = 0.05. Podemos concluir que las proporciones observadas no son significativamente diferentes de las proporciones esperadas.
+**Interpretación**: El valor p de la prueba es 0.9037, que es mayor que el nivel de significación alfa = 0.05. Podemos concluir que las proporciones observadas no son significativamente diferentes de las proporciones esperadas.
 
 
 
