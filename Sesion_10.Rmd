@@ -1,0 +1,274 @@
+---
+title: "Décima sesión"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+<div align="right">**Elaborado por Chiara Zamora** </div>
+<div align="right">PCPOCZAM@upc.edu.pe </div>
+<a id='home'></a>
+
+**Tabla de contenidos**
+
+1. [Prueba T de una muestra](### **1. Recordamos...**)
+
+2. [T-test: Importación y procesamiento de datos](### **2. T-test: Importación y procesamiento de datos**)
+
+3. [Prueba Wilcoxon de una muestra](### **3. Recordamos...**)
+
+4. [Wilcoxon test: Importación y procesamiento de datos](### **4. Wilcoxon test: Importación y procesamiento de datos**)
+
+---
+
+### **1. Recordamos...**
+ 
+#### **¿Qué es la prueba t de una muestra?**
+
+La prueba t de una muestra se utiliza para comparar la media de una muestra con una media estándar conocida (o teórica/hipotética) (μ).
+
+Generalmente, la media teórica proviene de:
+
+* un experimento anterior.
+
+* o de un experimento en el que tiene condiciones de control y tratamiento.
+
+Tenga en cuenta que la prueba t de una muestra **solo se puede usar cuando los datos se distribuyen normalmente**. Esto se puede comprobar mediante la prueba de Shapiro-Wilk o Kolgomorov Smirnov.</p>
+
+##### **Preguntas típicas de investigación**
+
+* ¿la media (m) de la muestra es igual a la media teórica (μ)? Prueba de dos colas.
+* ¿la media (m) de la muestra es menor que la media teórica (μ)? Prueba de una cola.
+* ¿la media (m) de la muestra es mayor que la media teórica (μ)? Prueba de una cola
+
+En estadística, podemos definir la hipótesis nula correspondiente (H0) de la siguiente manera:
+
+* H0:m=μ 
+* H0:m≤μ
+* H0:m≥μ
+
+Las hipótesis alternativas correspondientes (Ha) son las siguientes:
+
+* Ha:m≠μ (diferente)
+* Ha:m>μ (mayor)
+* Ha:m<μ (menor)
+
+#### **¿Cómo interpretar los resultados?**
+
+Si el p-valor es inferior o igual al nivel de significación 0.05, podemos rechazar la hipótesis nula y aceptar la hipótesis alternativa. En otras palabras, concluimos que la media muestral es significativamente diferente de la media teórica.
+
+#### **Implementación en R**
+
+**t.test(x, mu = 0, alternative = "two.sided")**
+
+* x: un vector numérico que contiene sus valores de datos
+
+* mu: la media teórica. El valor predeterminado es 0, pero puede cambiarlo.
+
+* alternative: la hipótesis alternativa. El valor permitido es uno de "two.sided" (predeterminado), "greater" o "less".
+
+---
+
+### **2. T-test: Importación y procesamiento de datos**
+
+```{r}
+library(rio)
+
+esperanza = import("life_expectancy.csv")
+```
+
+Recuperado de [CIA.gov](https://www.cia.gov/the-world-factbook/field/life-expectancy-at-birth/country-comparison)
+
+```{r}
+head(esperanza)
+```
+
+Queremos saber, ¿la esperanza de vida al nacer promedio difiere de 65 años?...
+
+Visualice sus datos usando diagrama de cajas:
+```{r}
+library(ggpubr)
+
+ggboxplot(esperanza$value,
+           ylab = "Esperanza de vida al nacer (años)", xlab = FALSE,
+           ggtheme = theme_minimal())
+```
+
+E histograma:
+```{r}
+hist(esperanza$value)
+```
+
+
+**Prueba preliminar para verificar los supuestos de la prueba t de una muestra:**
+
+* ¿Es esta una muestra grande? - Sí, porque n > 30.
+
+Si el tamaño de la muestra no es lo suficientemente grande (menos de 30, teorema del límite central), debemos verificar si los datos siguen una distribución normal.
+
+* ¿Cómo comprobar la normalidad?
+
+Brevemente, es posible utilizar la prueba de normalidad de Shapiro-Wilk y Kolmogorov-Smirnov y observar el gráfico de normalidad.
+
+**Prueba de Shapiro-Wilk:**
+
+Para muestras de 50 observaciones o menos. 
+
+* Hipótesis nula: los datos se distribuyen normalmente.
+* Hipótesis alternativa: los datos no se distribuyen normalmente.
+```{r}
+shapiro.test(esperanza$value)
+```
+
+**Prueba de Kolmogorov-Smirnov:**
+
+Para muestras de más de 50 observaciones.
+
+* Hipótesis nula: los datos se distribuyen normalmente.
+* Hipótesis alternativa: los datos no se distribuyen normalmente.
+```{r}
+library(nortest)
+lillie.test(esperanza$value)
+```
+
+```{r}
+# Prueba t de una muestra
+res <- t.test(esperanza$value, mu = 65)
+# Imprimiendo los resultados
+res
+```
+En el resultado anterior:
+
+* t es el valor estadístico de la prueba t;
+
+* df son los grados de libertad;
+
+* El valor p es el nivel de significancia de la prueba t;
+
+* conf.int es el intervalo de confianza de la media al 95 %;
+
+* sample estimates es el valor medio de la muestra.
+
+Tenga en cuenta que:
+
+si desea probar si la esperanza de vida al nacer promedio es menor a 65 años (prueba de una cola), escriba esto:
+```{r}
+t.test(esperanza$value, mu = 65,
+               alternative =  "less")
+```
+
+O, si desea probar si la esperanza de vida al nacer promedio es menor a 65 años (prueba de una cola), escriba esto:
+```{r}
+t.test(esperanza$value, mu = 65,
+               alternative =  "greater")
+```
+               
+* Para mayor información: http://www.sthda.com/english/wiki/one-sample-t-test-in-r
+
+---
+
+### **3. Recordamos...**
+
+#### **¿Qué es la prueba de rango con signo de Wilcoxon de una muestra?**
+
+La prueba de rango con signo de Wilcoxon de una muestra es una alternativa no paramétrica a la prueba t de una muestra cuando no se puede suponer que los datos se distribuyen normalmente. Se utiliza para determinar si la mediana de la muestra es igual a un valor estándar conocido (es decir, valor teórico).
+
+Tenga en cuenta que los datos deben distribuirse simétricamente alrededor de la mediana. En otras palabras, debe haber aproximadamente el mismo número de valores por encima y por debajo de la mediana.
+
+
+#### **Preguntas típicas de investigación**
+
+* ¿La mediana (m) de la muestra es igual al valor teórico (m0)?
+* ¿La mediana (m) de la muestra es menor que el valor teórico (m0)?
+* ¿La mediana (m) de la muestra es mayor que el valor teórico (m0)?
+
+En estadística, podemos definir la hipótesis nula correspondiente (H0) de la siguiente manera:
+
+* H0:m=m0
+* H0:m≤m0
+* H0:m≥m0
+
+Las hipótesis alternativas correspondientes (Ha) son las siguientes:
+
+* Ha:m≠m0 (diferente)
+* Ha:m>m0 (mayor)
+* Ha:m<m0 (menor)
+
+#### **Implementación en R**
+
+**wilcox.test(x, mu = 0, alternative = "two.sided")**
+
+* x: un vector numérico que contiene sus valores de datos.
+
+* mu: valor medio/mediano teórico. El valor predeterminado es 0, pero puede cambiarlo.
+
+* alternative: la hipótesis alternativa. El valor permitido es uno de "dos caras" (predeterminado), "mayor" o "menor".
+
+---
+
+### **4. Wilcoxon test: Importación y procesamiento de datos**
+
+```{r}
+obesity = import("obesity.csv")
+```
+
+```{r}
+head(obesity)
+```
+
+Recuperado de [CIA.gov][https://www.cia.gov/the-world-factbook/field/obesity-adult-prevalence-rate/country-comparison]
+
+Visualice sus datos usando diagramas de caja.
+```{r}
+ggboxplot(obesity$value, 
+          ylab = "Weight (g)", xlab = FALSE,
+          ggtheme = theme_minimal())
+```
+
+**Prueba de Shapiro-Wilk:**
+
+Para muestras de 50 observaciones o menos. 
+
+* Hipótesis nula: los datos se distribuyen normalmente.
+* Hipótesis alternativa: los datos no se distribuyen normalmente.
+```{r}
+shapiro.test(obesity$value)
+```
+
+**Prueba de Kolmogorov-Smirnov:**
+
+Para muestras de más de 50 observaciones.
+
+```{r}
+library(nortest)
+lillie.test(obesity$value)
+```
+
+Queremos saber, ¿la mediana difiere de 20 (prueba de dos colas)?
+```{r}
+summary(obesity$value)
+```
+
+```{r}
+# One-sample wilcoxon test
+res2 <- wilcox.test(obesity$value, mu = 20)
+# Printing the results
+res2 
+```
+
+Tenga en cuenta que:
+
+si desea probar si la mediana es menor a 20 (prueba de una cola), escriba esto:
+```{r}
+wilcox.test(obesity$value, mu = 20,
+              alternative = "less")
+```
+
+O, si desea probar si la mediana es menor a 20 (prueba de una cola), escriba esto:
+```{r}
+wilcox.test(obesity$value, mu = 20,
+              alternative = "greater")
+```
+
+* Para mayor información: http://www.sthda.com/english/wiki/one-sample-wilcoxon-signed-rank-test-in-r

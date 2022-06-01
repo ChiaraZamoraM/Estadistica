@@ -20,6 +20,8 @@ Veremos:
 
 3. [Datos cuantitativos](### **3. Datos cuantitativos**)
 
+---
+
 ### **1. Importación de datos**
 
 * **Datos en formato texto**
@@ -27,14 +29,6 @@ Veremos:
 - CSV: .csv
 ```{r}
 mydata = read.csv("https://github.com/ChiaraZamoraM/Stats_UPC/raw/main/ENAHO-737-Modulo01/Bases/Enaho01-2020-100.csv") 
-```
-
-```{r}
-getwd()
-```
-
-```{r}
-setwd("C:/Users/soyma/Documents/GitHub/Stats_UPC")
 ```
 
 ```{r}
@@ -105,9 +99,13 @@ library(rio)
 mydata = import("https://github.com/ChiaraZamoraM/Stats_UPC/raw/main/ENAHO-737-Modulo01/Bases/enaho01-2020-100.dta")
 ```
 
+---
+
 ### **2. Datos cualitativos**
 
-Una muestra de datos se denomina cualitativa o categórica, si sus valores pertenecen a una colección de clases no superpuestas definidas conocidas. Los ejemplos comunes incluyen la calificación de letras de los estudiantes (A, B, C, D o F), calificación de bonos comerciales (AAA, AAB, ...) y tallas de zapatos de ropa de consumo (0, 2, 4, ...).
+Una muestra de datos se denomina cualitativa o categórica, si sus valores pertenecen a una colección de clases no superpuestas definidas conocidas. 
+
+Los ejemplos comunes incluyen la calificación de letras de los estudiantes (A, B, C, D o F), calificación de bonos comerciales (AAA, AAB, ...) y tallas de zapatos de ropa de consumo (0, 2, 4, ...).
 
 Usaremos el data frame integrado de R llamado **painters**. Es una recopilación de información técnica de algunos pintores clásicos del siglo XVIII. El conjunto de datos pertenece al paquete MASS y debe cargarse previamente en el espacio de trabajo de R antes de su uso.
 
@@ -122,7 +120,6 @@ str(painters)
 ```
 
 La última columna School contiene la información de clasificación escolar de los pintores. Los colegios se nombran como A, B, ..., etc, y la variable School es cualitativa.
-
 ```{r}
 painters$School 
 ```

@@ -1,0 +1,351 @@
+---
+title: "Novena sesión"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+<div align="right">**Elaborado por Chiara Zamora** </div>
+<div align="right">PCPOCZAM@upc.edu.pe </div>
+<a id='home'></a>
+
+Veremos:
+
+**Estadística univariada**
+
+1. [Importación y limpieza de datos](### **1. Importación de datos**)
+
+2. [Tablas de frecuencia](### **2. Tablas de frecuencia**)
+
+3. [Medidas de tendencia central](### **3. Medidas de tendencia central**)
+
+4. [Medidas de dispersión](### **4. Medidas de dispersión**)
+
+5. [Medidas de posición](### **5. Medidas de posición**)
+
+6. [Medidas de simetría](### **6. Medidas de simetría**)
+
+---
+
+### **1. Importación de datos**
+
+Utilizaremos el conjunto de datos data que hace referencia a población en proceso migratorio.
+
+Ruta 1
+```{r}
+install.packages("readxl") 
+library(readxl)
+data = read_excel("C:/Users/MICHELLE/OneDrive/Escritorio/UPC/2021 - 2/SESION 7/data.xlsx")
+```
+
+Ruta 2
+```{r}
+install.packages("rio")
+library(rio)
+data = import("data.xlsx")
+```
+
+* Exploración del dataframe 
+
+```{r}
+dim(data)
+```
+
+```{r}
+names(data)
+```
+
+```{r}
+str(data)
+```
+
+```{r}
+str(data$Fecha_llegada) 
+```
+
+```{r}
+data$Fecha_llegada=as.character(data$Fecha_llegada)
+```
+  
+```{r}
+which(is.na(data))
+```
+
+---
+
+### **2. Tablas de frecuencia**
+
+#### **Simple o absoluta**
+
+```{r}
+documento = data$Documento
+```
+
+```{r}
+tabla1 = table(data$Documento) 
+```
+
+Visualizamos...
+```{r}
+barplot(tabla1)
+```
+
+### **Relativa**
+```{r}
+prop.table(tabla1)*100
+```
+
+Practiquemos...
+
+* De frecuencias simples/absolutas
+```{r}
+table(data$Sexo)
+```
+
+* De frecuencias relativas
+```{r}
+100*prop.table(table(data$Sexo))
+```
+
+##### Uso de **attach**
+```{r}
+attach(data) #me sirve para llamar a mi variable sin necesidad del signo de $
+Documento
+```
+
+```{r}
+detach(data) #cancela el attach
+Documento
+```
+
+```{r}
+head(data$Documento)
+```
+
+También podemos usar la función **freq** del paquete...
+
+* **descr**
+
+```{r}
+library(descr) #voy a tener porcentaje válido que no considera NA's 
+#detach("package:descr", unload = TRUE)#desconectar el paquete
+```
+
+```{r}
+tabla2 = freq(data$Estudios, plot=F) #combinación de table con prop.table
+```
+
+```{r}
+tabla2
+```
+
+* **Summarytools**
+```{r}
+#install.packages("summarytools")
+library(summarytools) #voy a tener porcentaje válido que no considera NA's
+```
+
+```{r}
+tabla3 = summarytools::freq(data$Documento)
+```
+
+---
+
+### **3. Medidas de tendencia central**
+
+#### **Media**
+```{r}
+mean(data$Edad)
+```
+
+```{r}
+mean.default(data$Edad, na.rm = TRUE) 
+```
+
+#### **Media recortada**
+
+Recortamos el 10% de las observaciones de cada extremo.
+```{r}
+mean.default(data$Edad, na.rm = TRUE, trim = 0.1)
+```
+
+#### **Mediana**
+
+```{r}
+median(data$Dinero_disponible)
+```
+
+```{r}
+median.default(data$Dinero_disponible, na.rm = TRUE)
+```
+
+#### **Moda**
+
+```{r}
+#install.packages("modeest")
+library(modeest)
+```
+
+```{r}
+mfv(data$Edad)
+```
+
+---
+
+### **4. Medidas de posición**
+
+#### **Cuartiles**
+
+```{r}
+quantile(data$Edad, prob = c(0.25, 0.5, 0.75), na.rm = TRUE)
+```
+
+#### **Quintiles**
+
+```{r}
+quantile(data$Edad, c(0.2, 0.4, 0.6, 0.8), na.rm = TRUE)
+```
+
+#### **Percentiles**
+
+Obtenemos el percentil 93.
+```{r}
+quantile(data$Edad, c(0.93), na.rm = TRUE)
+```
+
+#### Visualización: **Boxplot o diagrama de cajas**
+
+```{r}
+boxplot(data$Cantidad_dias, 
+        main = "Boxplot 1",
+        outline = TRUE)
+```
+
+```{r}
+boxplot(data$Edad, 
+        main = "Boxplot 2",
+        outline = TRUE)
+```
+
+---
+
+### **5. Medidas de dispersión**
+
+#### **Rango**
+
+```{r}
+range(data$Edad, na.rm = TRUE)
+```
+
+```{r}
+min(data$Edad, na.rm = TRUE)
+```
+
+```{r}
+max(data$Edad, na.rm = TRUE)
+```
+
+#### **Rango intercuartílico**
+
+Diferencia entre el Q1(primer cuartil) y Q3(tercer cuartil). 
+
+El 50% de los datos está dentro de este rango.
+```{r}
+IQR(data$Cantidad_dias)
+```
+
+#### **Varianza**
+
+```{r}
+var(data$Edad, na.rm = TRUE)
+```
+
+#### **Desviación estándar**
+
+```{r}
+sd(data$Edad, na.rm = TRUE)
+```
+
+#### **Coeficiente de variación**
+
+Desviación estándar entre la media. 
+
+Nos permite comparar la dispersión entre dos muestras.
+
+Datos más homogéneos cercanos a ceros.
+```{r}
+n=50
+
+muestra1= sample(1:nrow(data),size=n,replace=FALSE)
+
+data1= data[muestra1, ]
+
+cv1=sd(data1$Edad)/mean(data$Edad)
+```
+
+```{r}
+muestra2= sample(1:nrow(data),size=n,replace=FALSE)
+
+data2= data[muestra2, ]
+
+cv2= sd(data2$Edad)/mean(data$Edad)
+```
+
+```{r}
+cv1
+cv2
+```
+
+---
+
+### **6. Medidas de simetría**
+
+#### Visualización: **Histograma**
+
+```{r}
+hist(data$Edad)
+```
+
+#### **Asimetría**
+
+a. Asimetría Negativo 
+
+* Gráfica hacia la izquierda. 
+* Media < mediana < moda.  
+* SK < 0
+
+b. Simétrico
+
+* Coincide la media, mediana y moda en un mismo punto. 
+* SK = 0
+
+c. Asimetría Positiva
+
+* Gráfico hacia la derecha.
+* Media > mediana > moda. 
+* SK > O
+
+```{r}
+library(moments)
+skewness(data$Edad)
+```
+
+#### **Curtosis**
+
+a. Leptocúrtico
+
+* K > 0 
+
+b. Mesocúrtico
+
+* K = 0
+
+c.Platicúrtico
+
+* K < 0
+
+```{r}
+library(moments)
+kurtosis(data$Edad)
+```

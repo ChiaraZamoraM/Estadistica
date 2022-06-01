@@ -1,0 +1,169 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+### **3. Datos cuantitativos**
+
+Ahora, veamos algunas medidas de tendencia central, distribución y dispersión para el caso de variables numéricas. Trabajemos con la variable *state legitimacy*, indicador que evalúa la representatividad y apertura del gobierno, y la manera como interactúa con la ciudadanía. Se toman en cuenta los niveles de confianza en las instituciones, demostraciones de desobediencia civil e insurgencias armadas.
+
+Más información del indicador por acá: https://fragilestatesindex.org/indicators/p1/
+
+Primero cambiemos los nombres de las variables. R funciona mejor así
+
+```{r}
+names(data) #Para ver los nombres
+```
+
+```{r}
+colnames(data) = c("Country","Year","Rank","Score_Frag_States","Security","Elites","G_Grivance","Economy","Inequality","B_Drain","State_Legit","P_Services","Hum_Rights","Demo_Press","Refugees","Interven","Democracy_Score","Type") ##Para cambiar los nombres de las columnas (variables): es un código frecuente c() para dar mayor orden a una base de datos 
+```
+
+```{r}
+class(data$State_Legit) #Esta bien medida!, saber clase de objeto (num)
+```
+
+Exploremos la variable. Veamos medidas de tendencia central y de dispersión. Ojo con cómo está medido: 10 es un Estado que posee un alto grado de ilegitimidad (o presión). 0 un Estado con poca presión o alta legitimidad desde la ciudadanía.
+
+```{r}
+summary(data$State_Legit) #Ojo con los casos perdidos
+sd(data$State_Legit) #Desviacion estandar
+var(data$State_Legit) #veamos la varianza
+rango=max(data$State_Legit)-min(data$State_Legit)
+rango
+```
+
+Ahora veamos medidas de asimetría:
+
+```{r}
+library(moments) #libreria para asimetria y curtosis
+skewness(data$State_Legit) #Asimetría - Distribución asimétrica: la media queda desplazada hacia la cola más larga, implica un sesgo en la distribución, der e izq. El sesgo a la izquierda de valores bajos.
+kurtosis(data$State_Legit) #Curtosis - medida de apuntamiento - Mide la cantidad de datos que se agrupa en torno a la moda de la variable
+```
+
+¿Cómo interpretamos estos resultados?
+
+```{r,echo=FALSE, out.width="80%",fig.align="center"}
+knitr::include_graphics("skewness.png")
+```
+
+```{r,echo=FALSE, out.width="80%",fig.align="center"}
+knitr::include_graphics("kurtosis.png")
+```
+
+Veamos qué nos dicen los gráficos. Empecemos con un *boxplot*. ¿Encontraremos diferentes según las características del régimen político? ¿Qué conclusiones podríamos sacar de estos gráficos? 
+
+```{r fig.height=6, fig.width=9}
+boxplot(data$State_Legit) #gráfico para variable numérica
+boxplot(data$State_Legit~data$Type) #legitimidad de Estado y tipo de régimen 
+#Interpretación: Hay diferencia significativa si comparamos la legimitdad de estado por tipo de régimen (full democracy y regimen hibrido)
+```
+
+Veamos qué cosas trae **ggplot2**:
+
+```{r fig.height=6, fig.width=9}
+# x= tipo de regimen, y= legitimidad de Estado
+ggplot(data, aes(x=Type, y=State_Legit)) + 
+  geom_boxplot() + coord_flip() #Volteamos el gráfico
+```
+
+
+```{r fig.height=6, fig.width=9}
+ggplot(data, aes(x=Type, y=State_Legit, color =Type)) + #Damos color
+  geom_boxplot() + coord_flip() #Volteamos el gráfico
+```
+
+```{r fig.height=6, fig.width=9}
+ggplot(data, aes(x=Type, y=State_Legit, color =Type)) + 
+  geom_boxplot() + coord_flip() + #Volteamos el gráfico
+  theme(legend.position = "top") #leyenda a nivel superior
+#Interpretación: Hay diferencia significativa si comparamos la legimitdad de estado por tipo de régimen (full democracy y regimen hibrido)
+```
+
+```{r fig.height=6, fig.width=9}
+ggplot(data, aes(x=Type, y=State_Legit, color =Type)) + 
+  geom_boxplot() + coord_flip() #Volteamos el gráfico
+```
+
+```{r fig.height=6, fig.width=9}
+ggplot(data, aes(x=Type, y=State_Legit, color =Type)) + 
+  geom_boxplot() + coord_flip() + #Volteamos el gráfico
+ 
+   theme(legend.position = "top", axis.text.y = element_blank(), 
+        panel.background=element_rect(fill = "white", colour = "white")) + #Quitamos categorías para solo visualizar colores
+  
+  geom_jitter(shape=16, position=position_jitter(0.2)) + #Agregamos los casos como puntos (Dispersión de datos)
+  
+  labs(title = "Legitimidad estatal según el tipo de régimen político", x="", y="Index")
+```
+
+Finalmente, también podemos sacar un histograma para visualizar estos datos. ¿Tiene sentido según los coeficientes de asimetría y curtosis? Si
+
+```{r fig.height=6, fig.width=9}
+hist(data$State_Legit)
+#Interpretación: mayor frecuencia de países con legitimidad de estado 
+```
+
+Utilicemos **ggplot2** para agregar más detalles al gráfico como en los casos previos:
+
+```{r fig.height=6, fig.width=9}
+ggplot(data, aes(x=State_Legit)) + 
+  geom_histogram()
+```
+
+
+```{r fig.height=6, fig.width=9}
+ggplot(data, aes(x=State_Legit)) + 
+  geom_histogram() + 
+    labs(title="Legitimidad estatal", y="Conteo", x="Score")+
+    theme(plot.title = element_text(hjust = 0.5)) + #posición del titulo
+    theme(panel.background=element_rect(fill = "white", colour = "white")) + 
+    geom_vline(aes(xintercept=mean(State_Legit, na.rm = T)), # marcar el intercepto de la media (promedio), median=mediana
+            color="blue", linetype="dashed", size=1)
+```
+
+
+```{r fig.height=6, fig.width=9}
+ggplot(data, aes(x=State_Legit, color = Type)) + 
+  geom_histogram(fill="white",alpha=0.5, position="identity") + 
+    labs(title="Legitimidad estatal", y="Conteo", x="Indice")+
+    theme(plot.title = element_text(hjust = 0.5)) + #posición del titulo
+    theme(panel.background=element_rect(fill = "white", colour = "white"))
+```
+
+
+**Ejercicios**
+
+1. Compare medidas de dispersión de esta con otra variable de la base de datos. ¿A qué conclusiones llega?
+2. Compare asimetría y curtosis de esta variable con otra de la base de datos.¿A qué conclusiones llega?
+3. Analice descriptivos y elabore el gráfico correspondiente para otra variable numérica de la base de datos.
+
+
+# **3. Exportar y presentar**
+
+**¿Cómo exportamos la base de datos que hemos trabajado?**
+
+En muchos casos nos va ser útil exportar a CSV,lo podemos hacer con la función **export** del paquete **rio**:
+
+```{r}
+export(data, "midata.csv") 
+```
+
+También podemos exportar en formato R:
+
+```{r}
+save(data,file="midata.Rda")
+```
+
+**¿Cómo presentamos el trabajo realizado en este archivo Rmd?**
+
+Vamos a trabajar en archivos R markdown (Rmd), pero para presentarlos de una manera amigable, podemos exportarlos en formato PDF o Html, usando Knit
+
+Para Html, seleccionamos en el menú Knit \> Knit to html
+
+Para pdf, seleccionamos Knit \> Knit to PDF, pero antes de exportar en pdf deberá instalar lo siguiente desde su consola:
+
+-   **install.packages('tinytex')**
+
+-   **tinytex::install_tinytex()**

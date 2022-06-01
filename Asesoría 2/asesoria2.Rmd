@@ -1,0 +1,212 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+1.	Usa la base de datos “Nivel de bienestar.sav” y marque la correcta.
+```{r}
+library(haven)
+
+bienestar = read_sav("Nivel de bienestar.sav")
+```
+
+a.	Tiene 14 valores perdidos en la variable “ingresos” (F)
+```{r}
+library(Hmisc)
+
+describe(bienestar$ingresos)
+```
+
+b.	Tiene 36 valores perdidos en tota006C (V) NO HAY LA VARIABLE!
+```{r}
+#describe(bienestar$)
+```
+
+c.	Tiene 6 categorías distintas la variable “educ”
+```{r}
+table(bienestar$educ)
+```
+
+d.	La variable “sexo” tiene dos modas
+```{r}
+describe(bienestar)
+```
+
+```{r}
+dim(bienestar)
+```
+
+2.	Usa la base de datos “Nivel de bienestar.sav”, recodifica en una variable dicotómica la variable “ingresos”. Usa el valor de la media como punto de corte para tener los dos grupos y marque la correcta.
+
+```{r}
+describe(bienestar$ingresos)
+```
+
+```{r}
+bienestar$ingresos_cat = ifelse(bienestar$ingresos > 8464, 1, 0)
+```
+
+```{r}
+table(bienestar$ingresos_cat)
+```
+
+a.	Una categoría tiene el 30.6% de la información y la otra el 69.4%.
+```{r}
+prop.table(table(bienestar$ingresos_cat))
+```
+
+b.	Una categoría tiene el 32.5% de la información y la otra el 68.5%.
+c.	Una categoría tiene el 28.5% de la información y la otra el 72.5%.
+d.	Una categoría tiene 367 datos y la otra 218.
+e.	Una categoría cuenta con 118 datos y la otra 306
+
+3.	Usa la base de datos “Sinadef2.xlsx”, juntas las hojas “ESSALUD y otros1” y “ESSALUD y otros2” y genera un nuevo conjunto de datos llamado “DATA_TOTAL” (PARTE 1). Marque la correcta.
+```{r}
+library(readxl)
+
+parte1 = read_excel("Sinadef2.xlsx", 
+                    sheet = 1)
+```
+
+```{r}
+parte2 = read_excel("Sinadef2.xlsx", 
+                    sheet = 2)
+```
+
+```{r}
+head(parte1)
+```
+
+```{r}
+head(parte2)
+```
+
+```{r}
+DATA_TOTAL = merge(parte1, parte2, by = "ID")
+```
+
+a.	La moda de la variable “tipo de seguro” es “privados”. (F)
+```{r}
+library(Hmisc)
+describe(DATA_TOTAL$`TIPO SEGURO`)
+```
+
+b.	Los hombres tienen más seguros “privados” que las mujeres. (V)
+```{r}
+hombres = subset(DATA_TOTAL, SEXO == "MASCULINO")
+```
+
+```{r}
+mujeres = subset(DATA_TOTAL, SEXO != "MASCULINO")
+```
+
+```{r}
+describe(hombres$`TIPO SEGURO`)
+```
+```{r}
+describe(mujeres$`TIPO SEGURO`)
+```
+
+c.	La mediana de edad es 68.48.
+```{r}
+describe(DATA_TOTAL$EDAD)
+```
+
+d.	Todas las variables tienen, por lo menos, un dato perdido. 
+
+4.	A partir del nuevo conjunto de datos creado como “DATA_TOTAL” de la base de datos “Sinadef2.xlsx”, completa sus casos con la hoja “SIS” y genera un nuevo conjunto de datos (PARTE 2). Marque la correcta.
+```{r}
+sis = read_excel("Sinadef2.xlsx", 
+                    sheet = 3)
+```
+
+```{r}
+head(DATA_TOTAL)
+```
+
+```{r}
+head(sis)
+```
+
+```{r}
+Data_Total_2 = merge(DATA_TOTAL, sis, all= T)
+```
+
+a.	Hay 1200 casos y 7 variables 
+```{r}
+dim(Data_Total_2)
+```
+
+b.	Con md.pattern puedo confirmar que no hay valores perdidos
+```{r}
+library(mice)
+md.pattern(Data_Total_2)
+```
+
+c.	La variable “días de atención” tiene como media 34.
+```{r}
+describe(Data_Total_2$`DÍAS DE ATENCIÓN`)
+```
+5.	Usa la base de datos “Sinadef1.xlsx” y marque la correcta.
+```{r}
+sinadef1 = read_excel("Sinadef1.xlsx")
+```
+
+a.	La mediana de la variable “días” de atención es 33.
+```{r}
+describe(sinadef1$`DÍAS DE ATENCIÓN`)
+```
+
+b.	El valor máximo de la variable “edad” es 101.
+```{r}
+describe(sinadef1$EDAD)
+```
+
+c.	La media de la variable “edad” es 19.5
+```{r}
+describe(sinadef1$EDAD)
+```
+
+d.	Hay una mayor cantidad de Femenino que Masculino en la variable “sexo”.
+```{r}
+describe(sinadef1$SEXO)
+```
+
+6.	En la variable “edad” de la base de datos “Sinadef1.xlsx”, seleccionar los casos del 130 al 139 y del 870 al 879, e indicar el valor mínimo y máximo de este subconjunto. Marque la correcta.
+```{r}
+sinadef1_sub = sinadef1[c(130:139, 870:879),]
+```
+
+```{r}
+describe(sinadef1_sub$EDAD)
+```
+
+
+a.	64 y 81
+b.	40 y 98
+c.	41 y 98
+
+
+7.	Usa la base de datos “Sinadef1.xlsx” y marque la correcta.
+a.	La variable “Edad” cuenta con todos los casos completos.
+```{r}
+describe(sinadef1$EDAD)
+```
+
+b.	La variable “Departamento” tiene 7 valores perdidos. (incorrecta)
+```{r}
+describe(sinadef1$`DEPARTAMENTO DOMICILIO`)
+```
+
+c.	El “estado civil” del caso 547 es soltero.
+```{r}
+sinadef1[547,]
+```
+
+ d.	La región Amazonas es la “región” con menos casos. (incorrecta)
+```{r}
+table(sinadef1$`DEPARTAMENTO DOMICILIO`)
+```
+
+
+Ctrl+Alt+i --> abre un chunk

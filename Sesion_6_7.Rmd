@@ -1,0 +1,322 @@
+---
+title: "Sexta y sétima sesión"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+<div align="right">**Elaborado por Chiara Zamora** </div>
+<div align="right">PCPOCZAM@upc.edu.pe </div>
+<a id='home'></a>
+
+Veremos:
+
+**Análisis descriptivo y gráficos**
+
+1. [Importación y fusión de datos](### **1. Importación y fusión de datos**)
+
+2. [Datos cualitativos](### **2. Datos cualitativos**)
+
+3. [Datos cuantitativos](### **3. Datos cuantitativos**)
+
+---
+
+### **1. Importación y fusión de datos**
+
+Instalamos los paquetes que usaremos 
+```{r}
+#install.packages("DescTools")
+#install.packages("moments")
+#install.packages("ggplot2")
+#install.packages("taylor")
+```
+
+Abrimos los paquetes
+```{r}
+library(DescTools)
+library(moments)
+library(taylor)
+library(ggplot2)
+library(tidyverse)
+library(readxl)
+```
+
+Trabajaremos con la base **fsi-2021.xslx**, extraída de [Fragile States Index](https://fragilestatesindex.org/excel/)
+
+```{r}
+fsi = read_excel("fsi-2021.xlsx")
+```
+
+También trabajaremos con el gasto público en educación.
+
+```{r}
+public_expenditure = read.csv("SYB64_245_202110_Public expenditure on education.csv",
+                              skip = 1)
+```
+
+```{r}
+table(public_expenditure$Series)
+```
+
+```{r}
+str(public_expenditure)
+```
+
+```{r}
+public_expenditure_GDP = subset(public_expenditure, #especificamos nombre de la db
+                                Series== "Public expenditure on education (% of GDP)")
+```
+
+```{r}
+public_expenditure_GDP_f = public_expenditure_GDP %>% #pipe
+  group_by(X) %>% 
+  slice_max(Year)
+```
+
+Combinamos ambas bases
+
+#### **Merge**: Permite unir o fusionar dos data frames por columnas comunes
+
+- x = data frame 1
+- y = data frame 2
+- by = columna o columnas (unidas por el operador c()) usadas para unir
+  - by.x = columna o columnas usadas en el data frame 1
+  - by.y = columna o columnas usadas en el data frame 2
+- all = conservar todos los casos, incluso si no hay match entre data frames
+  - all.x = todos los casos del data frame 1, incluso si no son emparejados con la data frame 2
+  - all.x = todos los casos del data frame 2, incluso si no son emparejados con la data frame 1
+```{r}
+fsi_education = merge(fsi, public_expenditure_GDP_f, by.x= "Country", by.y ="X")
+```
+
+```{r}
+head(fsi_education)
+```
+
+Trabajaremos con...
+```{r}
+data = read_excel("state_democracy_final.xlsx")
+```
+
+---
+
+### **2. Datos cualitativos**
+
+Determinamos el tipo de variable.
+```{r}
+class(data$Type)
+```
+
+Pedimos la tabla de frecuencias
+```{r}
+table(data$Type)
+```
+
+Ahora las frecuencias relativas (relativas al número de celdas válidas).
+```{r}
+prop.table(table(data$Type))*100
+```
+
+Cambiamos de formato a la variable, es recomendable que nuestras variables categóricas sean del tipo **factor**.
+```{r}
+data$Type = factor(data$Type)
+```
+
+Comprobamos el cambio.
+```{r}
+str(data$Type) #tipo de variable
+```
+
+#### a. **Estadisticos de tendencia central**
+
+Se trata de una variable ordinal, podemos obtener su **moda** y **mediana*. 
+```{r}
+library(DescTools) 
+Mode(data$Type)
+```
+
+```{r}
+library(Hmisc)
+describe(data$Type)
+```
+
+#### b. **Gráficos, sin ggplot2**
+
+##### **Pie chart**
+
+Creamos un objeto que contenga la tabla de frecuencias de la variable **type**.
+```{r fig.height=6, fig.width=9}
+grafico1 <- table(data$Type) 
+```
+
+```{r fig.height=6, fig.width=9}
+grafico1
+```
+¿Qué contiene grafico1?
+
+La función **pie** no requiere la carga de librerías. Si queremos un pie más sofisticado, usaremos **ggplot2**. 
+* Podemos editar el radio con el atributo **radius**.
+* Con el atributo **cex** modificamos el tamaño de las etiquetas.
+```{r fig.height=6, fig.width=9}
+pie(grafico1, main = "Índice de democracia", radius = 1, cex = 1) 
+```
+
+##### **Barplot**
+
+La función **barplot** no requiere la carga de librerías. Si queremos un gráfico de barras más sofisticado, usaremos **ggplot2**. Sobre sus artibutos,
+
+col = color de las barras 
+main = título del gráfico
+xlab = título del eje x
+ylab = título del eje y
+cex.axis = tamaño del eje
+cex.lab = tamaño de las etiquetas
+las = cambia la orientación de las etiquetas del eje
+
+```{r fig.height=6, fig.width=9}
+#peso y altura del gráfico (height y width)
+
+barplot(grafico1, col = "chocolate",
+                  main = "Agrupación por tipo de democracia",
+                  xlab = "Tipos de regímenes políticos",
+                  ylab = "Frecuencias",
+                  cex.axis = 1,
+                  cex.lab = 1,
+                  las  = 1)
+```
+
+#### c. **Gráficos más chulos, con ggplot2**
+
+Más información sobre el lenguaje de **ggplot2**: https://www.rstudio.com/wp-content/uploads/2015/04/ggplot2-spanish.pdf
+
+Las funciones de esta librería trabajan con data frames, de ahí que convertimos nuestra tabla **grafico1** en un data frame.
+
+**Respuesta a la pregunta ¿data.frame o as.data.frame?** data.frame() se puede usar para construir un marco de datos, mientras que as.data.frame() solo se puede usar para obligar a otro objeto a un marco de datos.
+```{r}
+#Volvamos nuestro objeto un dataframe:
+grafico1 = as.data.frame(grafico1) #convertir a data frame
+```
+
+```{r}
+grafico1
+```
+
+Cambiamos el nombre de nuestras columnas en el nuevo data frame grafico1.
+```{r}
+colnames(grafico1) = c("Reg","Freq")
+```
+
+##### **Pie chart**
+
+Llamamos a **ggplot2**: la función ggplot te pide insertar el data frame (grafico1) y las características que tendrá el plot.Aquí debemos especificar:
+x = aquella variable que se proyectará en el eje x
+y = aquella variable que se proyectará en el eje y
+fill = cambia el color *interno* de la figura
+y otros...
+
+Sin embargo, la librería no ofrece ninguna opción específica para crear gráficos de pie. Tenemos que arreglarnosla de algún modo... Vamos a hacer circular un gráfico de barras. ggplot se caracteriza porque debe complementar con alguna función que comience con **geom_** y sea sucedido del tipo de gráfico que buscamos hacer. Por ejemplo, un gráfico de barras será **geom_bar**, un gráfico de puntos (dispersión) será geom_point, y así...
+
+En x, omitiremos ingresar una variable y solo ingresaremos un texto corto, en y ingresamos las frecuencias y en fill, el tipo de régimen: cada régimen tendrá un color específico.
+
+**geom_bar** nos pide completar el atributo **stat**, ¿por qué ingresamos **identity**? porque, por defecto, geom_bar cuenta cuántas filas tienen el valor de interés (las agrega), pero nosotros ya hemos calculado una tabla de frecuencias en la que hemos contado cuántos casos pertenecen a cada tipo de democracia. Solo requerimos que tome el conteo tal y como ya está en el data frame grafico1. 
+La función **coord_polar** hará la forma circular.
+```{r fig.height=6, fig.width=9}
+library(ggplot2)
+
+ggplot(grafico1, aes(x = "Tipo de regímenes políticos", y= Freq, fill= Reg)) +
+  geom_bar(stat="identity", width=2) + #width: ancho de sector
+  coord_polar("y", start=0) #coordenadas cartesianas: sirve para ubicar el pie chart en un plano cartesiano dependiendo del número de respuestas de cada opción y lo hace proporcionalmente
+```
+
+Eliminamos elementos innecesarios con el **theme_void()** o tema vacío y agregamos título. Cabe recordar que cada capa o cambio a las capas anteriores se agrega con un **+**
+```{r}
+ggplot(grafico1, aes(x="Tipo", y=Freq, fill=Reg)) +
+  ggtitle("Índice de democracia") + #agregamos el título
+  geom_bar(stat="identity", width=1, color="black") + 
+  coord_polar("y", start=0) +
+  theme_void() #se limpia el gráfico
+```
+  
+Elegimos colores de nuestra preferencia con la función **scale_fill_manual**, lleva el **manual** porque permite cambiar colores *manualmente*. Además, podemos guardar el gráfico en un objeto y continuar añadiendole capas...
+```{r}
+pc = ggplot(grafico1, aes(x="", y=Freq, fill=Reg)) +
+  ggtitle("Índice de democracia") +
+  geom_bar(stat="identity", width=1, color="white") + 
+  coord_polar("y", start=0) +
+  theme_void() #Con esto quitamos los elementos no requeridos
+```
+
+```{r}
+pc
+```
+
+```{r}
+pc + scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#00FF7F", "#008B8B","#D8BFD8")) 
+```
+
+También es posible usar paleas de colores con la función **scale_fill_brewer**
+```{r}
+pc + scale_fill_brewer(palette="Dark2")
+```
+
+La ventaja de que R sea un software libre es que permite a la comunidad hacer cosas muy interesantes e innovadoras, hasta una paleta con colores de los albums de Taylor Swift para pintar nuestros gráficos.
+
+Más información sobre esta librería por aquí: https://taylor.wjakethompson.com/index.html
+```{r fig.height=6, fig.width=9}
+library(taylor)
+
+pc + scale_fill_taylor_d(album="Fearless")
+```
+
+##### **Barplot**
+
+Esta vez sí especificamos el eje x: estará cada tipo de régimen y en y, la frecuencia.
+```{r fig.height=6, fig.width=9}
+ggplot(grafico1, aes(x= Reg, y = Freq)) + 
+  geom_bar(stat = "identity")
+```
+
+Poner **reorder** nos va a permitir reorganizar qué tipo se presenta primero en función de otra variable, por ejemplo, la frecuencia. La función coord_flip hará que el gráfico pase a estar volteado.
+```{r fig.height=6, fig.width=9}
+ggplot(grafico1, aes(x=reorder(Reg,Freq), y=Freq, fill=Reg)) + #Para ordenar el gráfico
+  geom_bar(stat = "identity") +
+    coord_flip() #Para voltearlo
+```
+
+Continuamos editando... Ahora agregamos títulos y etiquetas.
+```{r}
+ggplot(grafico1, aes(x=reorder(Reg,Freq), y=Freq, fill=Reg)) +
+  geom_bar(stat = "identity") +
+  labs(title="Índice de democracia", y="Frecuencias", x="Categorías") #poner titulos
+```
+
+Es posible cambiar la forma de nuestro gráfico, podemos hacer cambios al **tema** usando la función **theme**
+```{r}
+ggplot(grafico1, aes(x=reorder(Reg,Freq), y=Freq, fill=Reg)) + 
+  geom_bar(stat = "identity") +
+  labs(title="Índice de democracia", y="Frecuencias", x="Categorías")+
+  theme(plot.title = element_text(hjust = .5)) + # Cambiar la Posición del título 
+  theme(panel.background=element_rect(fill = "white", colour = "white"))  #Fondo y contorno blanco
+```
+
+También se guardan en elementos y se agregan capas más adelante. Como se les indicó antes, cuando se agregan figuras al gráfico la función suele iniciar por **geom_**. Ahora la función que agrega texto es **geom_text**, el atributo **label** contendrá la variable de la que se extrae la etiqueta, la posición vertical vendrá definida por el atributo **vjust**, mientras que el color del texto por **color** - debe estar DENTRO de los **aes** de **geom_text**, junto a su tamaño o **size**.
+```{r}
+bp = ggplot(grafico1, aes(x=reorder(Reg,Freq), y=Freq, fill=Reg)) +
+  geom_bar(stat = "identity") +  #Agregando capas, stat identity: Si desea que las alturas de las barras representen valores en los datos, use stat = "identity" y asigne una variable a la estética y
+    coord_flip() +  #Para voltear las barras
+    labs(title="Índice de democracia", y="Frecuencias", x="Categorías")+ #titulos
+    theme(plot.title = element_text(hjust = 1)) +  #Cambiar la Posición del título
+    theme(panel.background=element_rect(fill = "white", colour = "white")) + #Fondo y contorno blanco
+    geom_text(aes(label=Freq), vjust=4, color="blue", size=4) #Frecuencias en las barras - etiquetas de datos
+```
+
+```{r}
+bp
+```
+
+```{r}
+bp + scale_fill_taylor_d(album="Lover") #Paleta de colores. 
+```
+
+Si bien nuestra variable es **ordinal**, ambos gráficos pueden ser empleados en variables nominales.
