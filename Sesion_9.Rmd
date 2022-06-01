@@ -32,18 +32,12 @@ Veremos:
 
 Utilizaremos el conjunto de datos data que hace referencia a población en proceso migratorio.
 
-Ruta 1
+* Ruta
 ```{r}
-install.packages("readxl") 
-library(readxl)
-data = read_excel("C:/Users/MICHELLE/OneDrive/Escritorio/UPC/2021 - 2/SESION 7/data.xlsx")
-```
+#install.packages("rio")
 
-Ruta 2
-```{r}
-install.packages("rio")
 library(rio)
-data = import("data.xlsx")
+data = import("https://github.com/ChiaraZamoraM/Stats_UPC/raw/main/Databases/migration.xlsx")
 ```
 
 * Exploración del dataframe 
@@ -116,7 +110,7 @@ Documento
 
 ```{r}
 detach(data) #cancela el attach
-Documento
+#Documento
 ```
 
 ```{r}
